@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <img src="/images/ui/logo.png" alt="Logo" width="28" height="28">
+      <span>AutoRepuestos</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="topNav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a href="/" class="nav-link <%= title==='Inicio'?'active':'' %>">Inicio</a></li>
+        <li class="nav-item"><a href="/acerca" class="nav-link <%= title==='Acerca'?'active':'' %>">Acerca</a></li>
+        <li class="nav-item"><a href="/repuestos" class="nav-link <%= title==='Ventas'?'active':'' %>">Ventas</a></li>
+        <li class="nav-item"><a href="/historial-ventas" class="nav-link <%= title==='Historial'?'active':'' %>">Historial</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

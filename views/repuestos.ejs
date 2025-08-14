@@ -1,0 +1,220 @@
+<% layout('layouts/layout') %>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h3 class="text-center mb-3">Agregar repuesto</h3>
+    <form class="row g-3" action="/repuestos" method="post" enctype="multipart/form-data">
+      <div class="col-md-6">
+        <label class="form-label">Nombre</label>
+        <input name="nombre" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Marca</label>
+        <input name="marca" class="form-control" placeholder="Opcional">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Precio</label>
+        <input name="precio" type="number" step="0.01" min="0" class="form-control" value="0" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Imagen (desde tu PC)</label>
+        <input type="file" name="imagen" class="form-control">
+      </div>
+      <div class="col-12">
+        <label class="form-label">Descripción</label>
+        <input name="descripcion" class="form-control" placeholder="Opcional">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary">Agregar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% if (ventaOk) { %>
+  <div class="alert alert-success">¡Venta registrada correctamente!</div>
+<% } %>
+
+<div class="row g-3">
+  <!-- BUSCAR POR ID -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="mb-3">Buscar repuesto por ID</h5>
+        <form class="row g-2" action="/repuestos/buscar" method="get">
+          <div class="col-8">
+            <input type="number" name="id" class="form-control" placeholder="ID del repuesto" required min="1">
+          </div>
+          <div class="col-4">
+            <button class="btn btn-outline-primary w-100">Buscar</button>
+          </div>
+        </form>
+
+        <% if (typeof repuestoBuscado !== 'undefined' && repuestoBuscado && repuestoBuscado !== 'null') { %>
+          <hr>
+          <div class="d-flex gap-3">
+            <div style="width:180px">
+              <% if (repuestoBuscado.imagen) { %>
+                <img src="<%= repuestoBuscado.imagen %>" class="img-fluid rounded" style="height:120px;object-fit:cover" alt="img">
+              <% } else { %>
+                <img src="/images/ui/placeholder.webp" class="img-fluid rounded" style="height:120px;object-fit:cover" alt="img">
+              <% } %>
+            </div>
+            <div>
+              <div class="fw-bold">#<%= repuestoBuscado.id %> - <%= repuestoBuscado.nombre %></div>
+              <% if (repuestoBuscado.marca) { %><small class="text-muted d-block">Marca: <%= repuestoBuscado.marca %></small><% } %>
+              <small class="text-muted d-block">Precio: $<%= Number(repuestoBuscado.precio||0).toFixed(2) %></small>
+              <% if (repuestoBuscado.descripcion) { %><div class="small mt-1"><%= repuestoBuscado.descripcion %></div><% } %>
+              <div class="mt-2">
+                <a href="/repuestos?editId=<%= repuestoBuscado.id %>" class="btn btn-sm btn-warning">Editar</a>
+              </div>
+            </div>
+          </div>
+        <% } else if (repuestoBuscado === 'null') { %>
+          <hr>
+          <div class="alert alert-warning mb-0">No se encontró el repuesto con ese ID.</div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENDER -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="mb-3">Vender repuesto</h5>
+        <form class="row g-2" action="/repuestos/vender" method="post">
+          <div class="col-4">
+            <label class="form-label small">ID Repuesto</label>
+            <input type="number" name="repuestoId" class="form-control" required min="1">
+          </div>
+          <div class="col-4">
+            <label class="form-label small">Cantidad</label>
+            <input type="number" name="cantidad" class="form-control" value="1" min="1" required>
+          </div>
+          <div class="col-4">
+            <label class="form-label small">Cliente existente (ID)</label>
+            <input type="number" name="clienteId" class="form-control" placeholder="Opcional">
+          </div>
+
+          <div class="col-12">
+            <div class="form-text">Si no colocas <strong>clienteId</strong>, completa los campos para crear un cliente nuevo:</div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small">Nombre</label>
+            <input name="nombre" class="form-control" placeholder="Nombre cliente (opcional)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Correo</label>
+            <input name="correo" type="email" class="form-control" placeholder="Correo (opcional)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Teléfono</label>
+            <input name="telefono" class="form-control" placeholder="Teléfono (opcional)">
+          </div>
+
+          <div class="col-12 mt-2">
+            <button class="btn btn-success">Registrar venta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (editItem) { %>
+<div class="card shadow-sm my-4 border-warning">
+  <div class="card-body">
+    <h5 class="mb-3">Editar repuesto: <%= editItem.nombre %></h5>
+    <form class="row g-3" action="/repuestos/<%= editItem.id %>/editar" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="imagenActual" value="<%= editItem.imagen || '' %>"/>
+      <div class="col-md-6">
+        <label class="form-label">Nombre</label>
+        <input name="nombre" class="form-control" value="<%= editItem.nombre %>" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Marca</label>
+        <input name="marca" class="form-control" value="<%= editItem.marca || '' %>">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Precio</label>
+        <input name="precio" type="number" step="0.01" min="0" class="form-control" value="<%= Number(editItem.precio || 0) %>" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Reemplazar imagen</label>
+        <input type="file" name="imagen" class="form-control">
+      </div>
+      <div class="col-12">
+        <label class="form-label">Descripción</label>
+        <input name="descripcion" class="form-control" value="<%= editItem.descripcion || '' %>">
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-warning">Guardar cambios</button>
+        <a class="btn btn-secondary" href="/repuestos">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+<% } %>
+
+<hr class="my-4"/>
+
+<div class="d-flex justify-content-between align-items-center">
+  <h4 class="mb-0">Catálogo de repuestos</h4>
+  <a class="btn btn-sm btn-outline-secondary" href="http://localhost:3030/api/repuestos/json" target="_blank" rel="noopener">
+    Ver JSON de repuestos (API)
+  </a>
+</div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger mt-3">No se pudo cargar el catálogo</div>
+<% } %>
+
+<div class="row g-3 mt-2">
+  <% if ((items || []).length === 0) { %>
+    <div class="col-12"><em>Sin repuestos.</em></div>
+  <% } %>
+  <% (items || []).forEach(r => { %>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        <% if (r.imagen) { %>
+          <img src="<%= r.imagen %>" class="card-img-top" style="object-fit:cover;height:180px" alt="repuesto">
+        <% } else { %>
+          <img src="/images/ui/placeholder.webp" class="card-img-top" style="object-fit:cover;height:180px" alt="repuesto">
+        <% } %>
+        <div class="card-body">
+          <h6 class="card-title mb-1"><%= r.nombre %></h6>
+          <% if (r.marca) { %><small class="text-muted d-block">Marca: <%= r.marca %></small><% } %>
+          <small class="text-muted d-block">Precio: $<%= Number(r.precio || 0).toFixed(2) %></small>
+          <% if (r.descripcion) { %><p class="small mt-2"><%= r.descripcion %></p><% } %>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a class="btn btn-sm btn-outline-warning" href="/repuestos?editId=<%= r.id %>">Editar</a>
+          <form action="/repuestos/<%= r.id %>/eliminar" method="post" onsubmit="return confirm('¿Eliminar este repuesto?');">
+            <input type="hidden" name="imagen" value="<%= r.imagen || '' %>"/>
+            <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+
+<% if (totalPages && totalPages > 1) { %>
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+      <a class="page-link" href="/repuestos?page=<%= page-1 %>&limit=<%= limit %>">Anterior</a>
+    </li>
+    <% for (let p = 1; p <= totalPages; p++) { %>
+      <li class="page-item <%= p === page ? 'active' : '' %>">
+        <a class="page-link" href="/repuestos?page=<%= p %>&limit=<%= limit %>"><%= p %></a>
+      </li>
+    <% } %>
+    <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+      <a class="page-link" href="/repuestos?page=<%= page+1 %>&limit=<%= limit %>">Siguiente</a>
+    </li>
+  </ul>
+</nav>
+<% } %>
